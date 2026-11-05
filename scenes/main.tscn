@@ -1,9 +1,15 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/game_manager.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/enemy.tscn" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/hud.tscn" id="4"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
+size = Vector2(100, 100)
+
+[sub_resource type="BoxShape3D" id="BoxShape_ground"]
+size = Vector3(100, 1, 100)
 
 [node name="SaddamHero" type="Node3D"]
 script = ExtResource("1")
@@ -31,9 +37,3 @@ position = Vector3(0, 1, 7)
 position = Vector3(0, 1, -8)
 
 [node name="HUD" parent="." instance=ExtResource("4")]
-
-[sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
-size = Vector2(100, 100)
-
-[sub_resource type="BoxShape3D" id="BoxShape_ground"]
-size = Vector3(100, 1, 100)

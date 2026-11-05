@@ -1,4 +1,4 @@
-extends Node
+extends Node3D
 class_name WeaponController
 
 @export var magazine_size: int = 30

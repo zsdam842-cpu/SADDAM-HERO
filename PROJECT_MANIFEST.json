@@ -1,7 +1,8 @@
 {
   "project": "SADDAM HERO",
-  "repository": "Saddam-Battle",
-  "engine": "Godot 4.3+",
-  "status": "foundation prototype; not feature-complete",
-  "file_count": 16
+  "repository": "SADDAM-HERO",
+  "engine": "Godot 4.3",
+  "status": "playable prototype; debug APK builds locally and in CI",
+  "android_package": "com.saddamhero.game",
+  "file_count": 18
 }

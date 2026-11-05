@@ -3,54 +3,88 @@ name: Godot Android Build
 on:
   workflow_dispatch:
   push:
-    branches: [main, master]
 
 permissions:
   contents: read
 
+env:
+  GODOT_VERSION: 4.3-stable
+  ANDROID_BUILD_TOOLS: "34.0.0"
+  ANDROID_PLATFORM: "android-34"
+
 jobs:
-  validate-and-export:
+  build-apk:
+    name: Build debug APK
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Godot
-        uses: chickensoft-games/setup-godot@v2
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
         with:
-          version: 4.3.0
-          use-mono: false
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install Godot and export templates
+        run: |
+          curl -sSL -o /tmp/godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/Godot_v${GODOT_VERSION}_linux.x86_64.zip"
+          unzip -q /tmp/godot.zip -d /tmp/godot
+          sudo mv "/tmp/godot/Godot_v${GODOT_VERSION}_linux.x86_64" /usr/local/bin/godot
+          sudo chmod +x /usr/local/bin/godot
+          curl -sSL -o /tmp/templates.tpz "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/Godot_v${GODOT_VERSION}_export_templates.tpz"
+          unzip -q /tmp/templates.tpz -d /tmp/templates
+          mkdir -p "$HOME/.local/share/godot/export_templates"
+          mv /tmp/templates/templates "$HOME/.local/share/godot/export_templates/4.3.stable"
+          godot --version
+
+      - name: Install Android SDK packages
+        run: |
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKMANAGER" --licenses > /dev/null || true
+          "$SDKMANAGER" "platform-tools" "build-tools;${ANDROID_BUILD_TOOLS}" "platforms;${ANDROID_PLATFORM}"
+
+      - name: Configure Godot editor settings
+        run: |
+          mkdir -p "$HOME/.config/godot" "$HOME/.android"
+          keytool -keyalg RSA -genkeypair -alias androiddebugkey -keypass android \
+            -keystore "$HOME/.android/debug.keystore" -storepass android \
+            -dname "CN=Android Debug,O=Android,C=US" -validity 9999 -deststoretype pkcs12
+          cat > "$HOME/.config/godot/editor_settings-4.3.tres" <<EOF
+          [gd_resource type="EditorSettings" format=3]
+
+          [resource]
+          export/android/android_sdk_path = "$ANDROID_HOME"
+          export/android/java_sdk_path = "$JAVA_HOME"
+          export/android/debug_keystore = "$HOME/.android/debug.keystore"
+          export/android/debug_keystore_user = "androiddebugkey"
+          export/android/debug_keystore_pass = "android"
+          export/android/force_system_user = false
+          EOF
 
       - name: Import project
         run: godot --headless --editor --path . --quit
 
-      - name: Headless startup smoke check
-        run: timeout 60s godot --headless --path . --quit-after 5
+      - name: Headless startup smoke test
+        run: timeout 60s godot --headless --path . --quit-after 10
 
-      - name: Export Android APK (best effort)
-        continue-on-error: true
+      - name: Export debug APK
         run: |
-          if [ -f export_presets.cfg ]; then
-            mkdir -p build
-            godot --headless --path . --export-debug "Android" build/SADDAM-HERO.apk
-          else
-            echo "export_presets.cfg is not in the repo - skipping APK export."
-          fi
+          mkdir -p build
+          godot --headless --path . --export-debug "Android" build/SADDAM-HERO.apk
 
-      - name: Report APK status
-        if: always()
+      - name: Verify APK
         run: |
-          if [ -f build/SADDAM-HERO.apk ]; then
-            echo "APK exported: $(du -h build/SADDAM-HERO.apk | cut -f1)"
-          else
-            echo "No APK produced yet: Android export templates, keystore and an 'Android' export preset still need to be configured."
-          fi
+          APKSIGNER="$ANDROID_HOME/build-tools/${ANDROID_BUILD_TOOLS}/apksigner"
+          AAPT2="$ANDROID_HOME/build-tools/${ANDROID_BUILD_TOOLS}/aapt2"
+          "$APKSIGNER" verify build/SADDAM-HERO.apk
+          "$AAPT2" dump badging build/SADDAM-HERO.apk | head -4
+          ls -lh build/SADDAM-HERO.apk
 
       - name: Upload APK
-        if: hashFiles('build/SADDAM-HERO.apk') != ''
         uses: actions/upload-artifact@v4
         with:
-          name: SADDAM-HERO-Android
+          name: SADDAM-HERO-android-debug
           path: build/SADDAM-HERO.apk
-          if-no-files-found: ignore
+          if-no-files-found: error
