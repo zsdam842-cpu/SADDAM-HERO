@@ -1,0 +1,29 @@
+name: Godot Android Build
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Godot
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: 4.3.0
+          use-mono: false
+      - name: Import project
+        run: godot --headless --editor --path Saddam-Battle --quit
+      - name: Startup smoke check
+        run: timeout 30s godot --headless --path Saddam-Battle --quit-after 5
+      - name: Android export
+        run: |
+          test -f Saddam-Battle/export_presets.cfg
+          mkdir -p build
+          godot --headless --path Saddam-Battle --export-debug "Android" build/SADDAM-HERO.apk
+          test -f build/SADDAM-HERO.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SADDAM-HERO-Android
+          path: build/SADDAM-HERO.apk
