@@ -1,0 +1,56 @@
+name: Godot Android Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+jobs:
+  validate-and-export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Godot
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: 4.3.0
+          use-mono: false
+
+      - name: Import project
+        run: godot --headless --editor --path . --quit
+
+      - name: Headless startup smoke check
+        run: timeout 60s godot --headless --path . --quit-after 5
+
+      - name: Export Android APK (best effort)
+        continue-on-error: true
+        run: |
+          if [ -f export_presets.cfg ]; then
+            mkdir -p build
+            godot --headless --path . --export-debug "Android" build/SADDAM-HERO.apk
+          else
+            echo "export_presets.cfg is not in the repo - skipping APK export."
+          fi
+
+      - name: Report APK status
+        if: always()
+        run: |
+          if [ -f build/SADDAM-HERO.apk ]; then
+            echo "APK exported: $(du -h build/SADDAM-HERO.apk | cut -f1)"
+          else
+            echo "No APK produced yet: Android export templates, keystore and an 'Android' export preset still need to be configured."
+          fi
+
+      - name: Upload APK
+        if: hashFiles('build/SADDAM-HERO.apk') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: SADDAM-HERO-Android
+          path: build/SADDAM-HERO.apk
+          if-no-files-found: ignore
