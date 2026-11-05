@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/enemy_ai.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/health_component.gd" id="2"]
@@ -11,6 +11,14 @@ height = 1.8
 radius = 0.4
 height = 1.8
 
+[sub_resource type="StandardMaterial3D" id="Mat_enemy"]
+albedo_color = Color(0.42, 0.16, 0.14, 1)
+roughness = 0.8
+
+[sub_resource type="SphereMesh" id="Mesh_enemy_head"]
+radius = 0.21
+height = 0.42
+
 [node name="Enemy" type="CharacterBody3D" groups=["enemies"]]
 script = ExtResource("1")
 
@@ -20,6 +28,12 @@ shape = SubResource("CapsuleShape_enemy")
 [node name="Body" type="MeshInstance3D" parent="."]
 position = Vector3(0, 0.9, 0)
 mesh = SubResource("CapsuleMesh_enemy")
+material_override = SubResource("Mat_enemy")
+
+[node name="Head" type="MeshInstance3D" parent="."]
+position = Vector3(0, 1.78, 0)
+mesh = SubResource("Mesh_enemy_head")
+material_override = SubResource("Mat_enemy")
 
 [node name="Health" type="Node" parent="."]
 script = ExtResource("2")

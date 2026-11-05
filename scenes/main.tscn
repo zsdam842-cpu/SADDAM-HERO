@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scripts/game_manager.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="2"]
@@ -6,10 +6,34 @@
 [ext_resource type="PackedScene" path="res://scenes/hud.tscn" id="4"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
-size = Vector2(100, 100)
+size = Vector2(120, 120)
+
+[sub_resource type="StandardMaterial3D" id="Mat_ground"]
+albedo_color = Color(0.26, 0.29, 0.21, 1)
+roughness = 0.95
 
 [sub_resource type="BoxShape3D" id="BoxShape_ground"]
-size = Vector3(100, 1, 100)
+size = Vector3(120, 1, 120)
+
+[sub_resource type="BoxMesh" id="Mesh_crate"]
+size = Vector3(2, 2, 2)
+
+[sub_resource type="StandardMaterial3D" id="Mat_crate"]
+albedo_color = Color(0.33, 0.3, 0.22, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="Mesh_wall"]
+size = Vector3(6, 3, 1)
+
+[sub_resource type="StandardMaterial3D" id="Mat_wall"]
+albedo_color = Color(0.3, 0.31, 0.28, 1)
+roughness = 0.85
+
+[sub_resource type="BoxShape3D" id="Shape_crate"]
+size = Vector3(2, 2, 2)
+
+[sub_resource type="BoxShape3D" id="Shape_wall"]
+size = Vector3(6, 3, 1)
 
 [node name="SaddamHero" type="Node3D"]
 script = ExtResource("1")
@@ -26,14 +50,64 @@ position = Vector3(0, -0.5, 0)
 
 [node name="Mesh" type="MeshInstance3D" parent="Ground"]
 mesh = SubResource("PlaneMesh_ground")
+material_override = SubResource("Mat_ground")
 
 [node name="Collision" type="CollisionShape3D" parent="Ground"]
 shape = SubResource("BoxShape_ground")
 
+[node name="Cover" type="Node3D" parent="."]
+
+[node name="Crate1" type="StaticBody3D" parent="Cover"]
+position = Vector3(-7, 1, -2)
+
+[node name="Mesh" type="MeshInstance3D" parent="Cover/Crate1"]
+mesh = SubResource("Mesh_crate")
+material_override = SubResource("Mat_crate")
+
+[node name="Collision" type="CollisionShape3D" parent="Cover/Crate1"]
+shape = SubResource("Shape_crate")
+
+[node name="Crate2" type="StaticBody3D" parent="Cover"]
+position = Vector3(8, 1, -5)
+
+[node name="Mesh" type="MeshInstance3D" parent="Cover/Crate2"]
+mesh = SubResource("Mesh_crate")
+material_override = SubResource("Mat_crate")
+
+[node name="Collision" type="CollisionShape3D" parent="Cover/Crate2"]
+shape = SubResource("Shape_crate")
+
+[node name="Wall1" type="StaticBody3D" parent="Cover"]
+position = Vector3(0, 1.5, -18)
+
+[node name="Mesh" type="MeshInstance3D" parent="Cover/Wall1"]
+mesh = SubResource("Mesh_wall")
+material_override = SubResource("Mat_wall")
+
+[node name="Collision" type="CollisionShape3D" parent="Cover/Wall1"]
+shape = SubResource("Shape_wall")
+
+[node name="Wall2" type="StaticBody3D" parent="Cover"]
+position = Vector3(-14, 1.5, -8)
+rotation = Vector3(0, 1.2, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Cover/Wall2"]
+mesh = SubResource("Mesh_wall")
+material_override = SubResource("Mat_wall")
+
+[node name="Collision" type="CollisionShape3D" parent="Cover/Wall2"]
+shape = SubResource("Shape_wall")
+
 [node name="Player" parent="." instance=ExtResource("2")]
-position = Vector3(0, 1, 7)
+position = Vector3(0, 1, 9)
 
 [node name="Enemy" parent="." instance=ExtResource("3")]
-position = Vector3(0, 1, -8)
+position = Vector3(0, 1, -10)
+
+[node name="Enemy2" parent="." instance=ExtResource("3")]
+position = Vector3(-11, 1, -14)
+
+[node name="Enemy3" parent="." instance=ExtResource("3")]
+position = Vector3(12, 1, -16)
 
 [node name="HUD" parent="." instance=ExtResource("4")]
