@@ -1,0 +1,77 @@
+{
+  "campaign": "SADDAM HERO",
+  "missions": [
+    {
+      "id": 1,
+      "name": "Mission 01",
+      "title": "First Light",
+      "status": "prototype"
+    },
+    {
+      "id": 2,
+      "name": "Mission 02",
+      "title": "Desert Convoy",
+      "status": "planned"
+    },
+    {
+      "id": 3,
+      "name": "Mission 03",
+      "title": "Silent Ridge",
+      "status": "planned"
+    },
+    {
+      "id": 4,
+      "name": "Mission 04",
+      "title": "Outpost Storm",
+      "status": "planned"
+    },
+    {
+      "id": 5,
+      "name": "Mission 05",
+      "title": "Broken Radio",
+      "status": "planned"
+    },
+    {
+      "id": 6,
+      "name": "Mission 06",
+      "title": "Night Watch",
+      "status": "planned"
+    },
+    {
+      "id": 7,
+      "name": "Mission 07",
+      "title": "Iron Road",
+      "status": "planned"
+    },
+    {
+      "id": 8,
+      "name": "Mission 08",
+      "title": "Dust Devil",
+      "status": "planned"
+    },
+    {
+      "id": 9,
+      "name": "Mission 09",
+      "title": "Rescue Line",
+      "status": "planned"
+    },
+    {
+      "id": 10,
+      "name": "Mission 10",
+      "title": "The Hangar",
+      "status": "planned"
+    },
+    {
+      "id": 11,
+      "name": "Mission 11",
+      "title": "Last Checkpoint",
+      "status": "planned"
+    },
+    {
+      "id": 12,
+      "name": "Mission 12",
+      "title": "Homefront",
+      "status": "planned"
+    }
+  ]
+}
